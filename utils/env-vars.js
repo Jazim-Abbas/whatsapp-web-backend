@@ -1,3 +1,3 @@
 module.exports = {
-  MONGO_URI: "mongodb://localhost:27017/whatsapp-web",
+  MONGO_URI: process.env.MONGO_URI || "mongodb://localhost:27017/whatsapp-web",
 };
