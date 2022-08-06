@@ -1,6 +1,8 @@
 const express = require("express");
+const dbConnect = require("./db/connect");
 const { getRandomSentence, getResponseInterval } = require("./utils");
 
+dbConnect();
 const PORT = process.env.PORT || 5000;
 const app = express();
 const server = app.listen(PORT, () => console.log("Server running..."));
