@@ -19,6 +19,7 @@ module.exports = {
    */
   login: async (req, res) => {
     const cleanFields = await validate(validations.loginSchema, req.body);
-    res.send({ cleanFields });
+    const userInDb = await userService.loginUser(cleanFields);
+    res.send({ userInDb });
   },
 };
