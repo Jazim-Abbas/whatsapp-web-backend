@@ -1,4 +1,5 @@
 const { request, response } = require("express");
+const userService = require("../../services/user");
 const validate = require("../../utils/validations");
 const validations = require("../../utils/validations/auth");
 
@@ -9,7 +10,8 @@ module.exports = {
    */
   register: async (req, res) => {
     const cleanFields = await validate(validations.registerSchema, req.body);
-    res.send({ cleanFields });
+    await userService.createNewUser(cleanFields);
+    res.send({ message: "Successfully created new user" });
   },
   /**
    * @param {request} req
