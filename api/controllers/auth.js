@@ -20,6 +20,7 @@ module.exports = {
   login: async (req, res) => {
     const cleanFields = await validate(validations.loginSchema, req.body);
     const userInDb = await userService.loginUser(cleanFields);
-    res.send({ userInDb });
+    const user = { ...userInDb.getMinimalUserFields(), token: userInDb.generateJwtToken() };
+    res.send({ user });
   },
 };

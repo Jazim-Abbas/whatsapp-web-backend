@@ -1,5 +1,7 @@
-const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const envVars = require("../utils/env-vars");
 
 const userSchema = new mongoose.Schema({
   name: String,
@@ -41,5 +43,19 @@ userSchema.method("comparePassword", async function (password) {
   return bcrypt.compare(password, this.password);
 });
 
+userSchema.method("generateJwtToken", function () {
+  const payloadFields = getMinimalUserFields.bind(this)();
+  return jwt.sign(payloadFields, envVars.JWT_SECRET);
+});
+
+userSchema.method("getMinimalUserFields", function () {
+  return getMinimalUserFields.bind(this)();
+});
+
 const User = mongoose.model("User", userSchema);
 module.exports = User;
+
+function getMinimalUserFields() {
+  const { _id, name, email } = this._doc;
+  return { _id, name, email };
+}
