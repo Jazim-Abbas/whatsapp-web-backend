@@ -42,6 +42,7 @@ module.exports = {
   makeNewFriend: async (record) => {
     const { loggedInUserId, opponentUserId } = record;
 
+    await checkUserAlreadyHasChannelWithOpponentUser(loggedInUserId, opponentUserId);
     const channel = await createChannel(loggedInUserId, opponentUserId);
     await addOpponentUserToUserChannel(loggedInUserId, channel._id);
     await addOpponentUserToUserChannel(opponentUserId, channel._id);
@@ -53,6 +54,16 @@ module.exports = {
 async function isUserExistsAndPasswordMatched(userInDb, password) {
   if (!userInDb) return false;
   return await userInDb.comparePassword(password);
+}
+
+async function checkUserAlreadyHasChannelWithOpponentUser(loggedInUserId, opponendUserId) {
+  const userRecord = await db.User.findById(loggedInUserId).populate("channels").select("channels");
+  userRecord.channels.forEach((ch) => {
+    const isChannelAlreadyExists = ch.users && ch.users.has(loggedInUserId) && ch.users.has(opponendUserId);
+    if (isChannelAlreadyExists) {
+      throw new Exceptions.BadRequestError({ message: "Already channel exists with the user" });
+    }
+  });
 }
 
 async function createChannel(userA, userB) {
