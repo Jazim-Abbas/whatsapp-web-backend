@@ -33,9 +33,42 @@ module.exports = {
 
     return userInDb;
   },
+  /**
+   * @param {{
+   *  loggedInUserId: string
+   *  opponentUserId: string
+   * }} record
+   */
+  makeNewFriend: async (record) => {
+    const { loggedInUserId, opponentUserId } = record;
+
+    const channel = await createChannel(loggedInUserId, opponentUserId);
+    await addOpponentUserToUserChannel(loggedInUserId, channel._id);
+    await addOpponentUserToUserChannel(opponentUserId, channel._id);
+
+    return channel;
+  },
 };
 
 async function isUserExistsAndPasswordMatched(userInDb, password) {
   if (!userInDb) return false;
   return await userInDb.comparePassword(password);
+}
+
+async function createChannel(userA, userB) {
+  const channelUsers = {
+    [userA]: "user",
+    [userB]: "user",
+  };
+  return db.Channel.create({ users: channelUsers });
+}
+
+async function addOpponentUserToUserChannel(userId, channelId) {
+  const userInDb = await db.User.findById(userId);
+  if (!userInDb) {
+    throw new Exceptions.BadRequestError({ message: userId + " is not found" });
+  }
+
+  userInDb.channels.push(channelId);
+  await userInDb.save();
 }

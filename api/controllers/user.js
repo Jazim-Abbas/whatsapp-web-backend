@@ -1,4 +1,5 @@
 const { request, response } = require("express");
+const userService = require("../../services/user");
 const validate = require("../../utils/validations");
 const validations = require("../../utils/validations/user");
 
@@ -9,6 +10,10 @@ module.exports = {
    */
   makeFriend: async (req, res) => {
     const cleanFields = await validate(validations.makeFriendSchema, req.body);
-    res.send({ cleanFields });
+    const channel = await userService.makeNewFriend({
+      loggedInUserId: req.user._id,
+      opponentUserId: cleanFields.opponendUserId,
+    });
+    res.send({ channel });
   },
 };
