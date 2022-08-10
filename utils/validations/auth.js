@@ -6,4 +6,8 @@ module.exports = {
     email: yup.string().email().required().label("Email"),
     password: yup.string().min(8).max(30).required().label("Password"),
   }),
+  loginSchema: yup.object().shape({
+    email: yup.string().email().required().label("Email"),
+    password: yup.string().min(8).max(30).required().label("Password"),
+  }),
 };

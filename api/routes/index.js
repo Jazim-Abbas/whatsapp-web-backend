@@ -4,6 +4,7 @@ const authRoutes = require("./auth");
 const catchApiUnhandleExceptions = require("../middlewares/exception-handling");
 
 const router = express.Router();
+router.use(express.json());
 router.get("/", (_, res) => {
   // for Health Check
   res.send("This service is up and running...");

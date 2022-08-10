@@ -6,6 +6,12 @@ const userSchema = new mongoose.Schema({
   password: String,
   profilePicURL: String,
   lastSeen: Date,
+  channels: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Channel",
+    },
+  ],
 });
 
 const User = mongoose.model("User", userSchema);

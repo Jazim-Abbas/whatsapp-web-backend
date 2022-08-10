@@ -11,4 +11,12 @@ module.exports = {
     const cleanFields = await validate(validations.registerSchema, req.body);
     res.send({ cleanFields });
   },
+  /**
+   * @param {request} req
+   * @param {response} res
+   */
+  login: async (req, res) => {
+    const cleanFields = await validate(validations.loginSchema, req.body);
+    res.send({ cleanFields });
+  },
 };
