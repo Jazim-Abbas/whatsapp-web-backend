@@ -3,6 +3,14 @@ const Exceptions = require("../utils/custom-errors");
 
 module.exports = {
   /**
+   * @param {string} username
+   */
+  searchUsers: async (username) => {
+    return db.User.find({
+      name: { $regex: ".*" + username + ".*", $options: "i" },
+    }).select("name email profilePicURL");
+  },
+  /**
    * @param {{
    *  name: string
    *  email: string

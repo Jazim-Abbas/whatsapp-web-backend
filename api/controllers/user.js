@@ -8,6 +8,15 @@ module.exports = {
    * @param {request} req
    * @param {response} res
    */
+  searchUsers: async (req, res) => {
+    const cleanFields = await validate(validations.searchSchema, req.body);
+    const users = await userService.searchUsers(cleanFields.username);
+    res.send({ users });
+  },
+  /**
+   * @param {request} req
+   * @param {response} res
+   */
   makeFriend: async (req, res) => {
     const cleanFields = await validate(validations.makeFriendSchema, req.body);
     const channel = await userService.makeNewFriend({
