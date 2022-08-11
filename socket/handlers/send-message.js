@@ -4,7 +4,8 @@ module.exports = (socket) => {
   return async (fields, ackCallback) => {
     const { messageBody, userId, channelId } = fields;
 
-    const message = await messageService.saveMessage({ messageBody, userId, channelId, autoId: 2 });
+    const autoId = await messageService.getAutoIdForChannel({ channelId });
+    const message = await messageService.saveMessage({ messageBody, userId, channelId, autoId });
 
     if (ackCallback) ackCallback(message);
   };
