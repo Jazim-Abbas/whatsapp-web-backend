@@ -2,6 +2,7 @@ const express = require("express");
 const dbConnect = require("./db/connect");
 const allApiRoutes = require("./api/routes");
 const chatNamespace = require("./socket/namespaces/chat");
+const isAuthMiddleware = require("./socket/middlewares/is-auth");
 const { getRandomSentence, getResponseInterval } = require("./utils");
 
 dbConnect();
@@ -33,4 +34,5 @@ io.on("connection", (socket) => {
 });
 
 const chatNS = io.of("/chat");
+chatNS.use(isAuthMiddleware);
 chatNS.on("connection", (socket) => chatNamespace(io, chatNS, socket));

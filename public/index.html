@@ -11,16 +11,18 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var socket = io("/chat");
+      var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MmYzODM3NzNjMWM5OWEyOWQ0NGFiOWMiLCJuYW1lIjoiSmF6aW0gQWJiYXMiLCJlbWFpbCI6ImphemltQGdtYWlsLmNvbSIsImlhdCI6MTY2MDEyNzQxMX0.ve8c-unQbOu0SVFshodwtbfFIXDSJ0Jmn1XhVEogR80";
+
+      var socket = io("/chat", { auth: { token } });
 
       socket.on("connect_error", (err) => {
         console.log("err from server: ", err);
       });
 
-      let clientMsg = { messageBody: "hello", userId: "62f383773c1c99a29d44ab9c", channelId: "62f3a8742d1789b42be79e27" };
+      /* let clientMsg = { messageBody: "hello", userId: "62f383773c1c99a29d44ab9c", channelId: "62f3a8742d1789b42be79e27" };
       socket.emit("msg-from-client", clientMsg, (data) => {
         console.log("ack message from server: ", data);
-      });
+      }); */
     </script>
   </body>
 </html>
