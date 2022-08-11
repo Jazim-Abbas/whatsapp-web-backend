@@ -33,4 +33,4 @@ io.on("connection", (socket) => {
 });
 
 const chatNS = io.of("/chat");
-chatNS.on("connection", chatNamespace);
+chatNS.on("connection", (socket) => chatNamespace(io, chatNS, socket));
