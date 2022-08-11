@@ -1,6 +1,7 @@
 const express = require("express");
 const dbConnect = require("./db/connect");
 const allApiRoutes = require("./api/routes");
+const chatNamespace = require("./socket/namespaces/chat");
 const { getRandomSentence, getResponseInterval } = require("./utils");
 
 dbConnect();
@@ -8,6 +9,7 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 const server = app.listen(PORT, () => console.log("Server running..."));
 
+app.use(express.static("public"));
 app.use("/", allApiRoutes);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
 
@@ -29,3 +31,6 @@ io.on("connection", (socket) => {
     }, 1500);
   });
 });
+
+const chatNS = io.of("/chat");
+chatNS.on("connection", chatNamespace);
