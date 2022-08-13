@@ -19,9 +19,13 @@
         console.log("err from server: ", err);
       });
 
-      let clientMsg = { messageBody: "hello", userId: "62f383773c1c99a29d44ab9c", channelId: "62f3a8742d1789b42be79e27" };
+      /* let clientMsg = { messageBody: "hello", userId: "62f383773c1c99a29d44ab9c", channelId: "62f3a8742d1789b42be79e27" };
       socket.emit("msg-from-client", clientMsg, (data) => {
         console.log("ack message from server: ", data);
+      }); */
+
+      socket.emit("get-user-channels", null, (data) => {
+        console.log("user-channels: ", data);
       });
     </script>
   </body>

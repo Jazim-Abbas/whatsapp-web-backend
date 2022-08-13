@@ -11,6 +11,12 @@ module.exports = {
     }).select("name email profilePicURL");
   },
   /**
+   * @param {string} userId
+   */
+  getUserChannelsWithLastMessage: async (userId) => {
+    return db.User.findById(userId).populate({ path: "channels", populate: { path: "lastMessage", model: "Message" } });
+  },
+  /**
    * @param {{
    *  name: string
    *  email: string
