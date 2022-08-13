@@ -14,7 +14,12 @@ module.exports = {
    * @param {string} userId
    */
   getUserChannelsWithLastMessage: async (userId) => {
-    return db.User.findById(userId).populate({ path: "channels", populate: { path: "lastMessage", model: "Message" } });
+    const populatedFields = {
+      path: "channels",
+      populate: { path: "lastMessage", model: "Message" },
+    };
+    const userChannels = await db.User.findById(userId).populate(populatedFields);
+    return userChannels.channels;
   },
   /**
    * @param {{
