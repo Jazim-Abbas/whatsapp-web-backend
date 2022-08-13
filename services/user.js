@@ -25,7 +25,7 @@ module.exports = {
    * @param {string} userId
    */
   getUser: async (userId) => {
-    return db.User.findById(userId).select("name email profilePicURL");
+    return db.User.findById(userId).select("name email profilePicURL lastSeen");
   },
   /**
    * @param {{

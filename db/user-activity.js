@@ -14,6 +14,7 @@ const userActivity = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Message",
   },
+  lastSeenMessageStatus: String,
 });
 
 const UserActivity = mongoose.model("UserActivity", userActivity);
