@@ -22,6 +22,12 @@ module.exports = {
     return userChannels.channels;
   },
   /**
+   * @param {string} userId
+   */
+  getUser: async (userId) => {
+    return db.User.findById(userId).select("name email profilePicURL");
+  },
+  /**
    * @param {{
    *  name: string
    *  email: string

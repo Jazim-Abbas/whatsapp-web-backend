@@ -13,15 +13,33 @@ module.exports = (socket) => {
 
 class UserChannel {
   _socket = null;
+  _userId = null;
+  _userChannels = [];
+  _userChannelRes = [];
+  _userChannelsMap = new Map();
 
   constructor(socket) {
     this._socket = socket;
   }
 
   async getUserChannels() {
-    const userId = this._socket.request.user._id;
-    const userChannels = await userService.getUserChannelsWithLastMessage(userId);
+    this._userId = this._socket.request.user._id;
+    this._userChannels = await userService.getUserChannelsWithLastMessage(this._userId);
+    await this.convertUserChannelsToMapAndAddOpponentUser();
 
-    return userChannels;
+    console.log("user-map ----: ", this._userChannelsMap);
+
+    return this._userChannels;
+  }
+
+  async convertUserChannelsToMapAndAddOpponentUser() {
+    await Promise.all(
+      this._userChannels.map(async (channel) => {
+        const opponentUserId = Array.from(channel.users.keys()).find((user) => user !== this._userId);
+        const opponentUser = await userService.getUser(opponentUserId);
+
+        this._userChannelsMap.set(channel._id, { ...channel._doc, ...opponentUser._doc });
+      })
+    );
   }
 }
