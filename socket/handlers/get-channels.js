@@ -44,19 +44,21 @@ class UserChannel {
       return this.makeDefaultResponse(ch);
     });
 
-    return this._userChannels;
+    return this._userChannelRes;
   }
 
   async convertUserChannelsToMap_AddOpponentUser_AndUserActivity() {
     await Promise.all(
       this._userChannels.map(async (channel) => {
         const opponentUser = await this.getOpponentUser(channel.users);
-        const userActivity = await this.getUserActivity(channel._id);
+        const userActivity = await this.getUserActivity(channel._id, this._userId);
+        const opponentUserActivity = await this.getUserActivity(channel._id, opponentUser._id);
 
         const mapRecord = {
           ...channel._doc,
           ...opponentUser._doc,
           userActivity: userActivity._doc,
+          opponentUserActivity: opponentUserActivity._doc,
         };
         this._userChannelsMap.set(channel._id, mapRecord);
       })
@@ -72,8 +74,8 @@ class UserChannel {
     return opponentUser;
   }
 
-  async getUserActivity(channelId) {
-    const record = await userActivityService.getUserActivity({ userId: this._userId, channelId });
+  async getUserActivity(channelId, userId) {
+    const record = await userActivityService.getUserActivity({ userId, channelId });
     return record || { _doc: {} };
   }
 
@@ -89,7 +91,7 @@ class UserChannel {
 
   isLastMessageSentByOpponentUser(channel) {
     const { lastMessage } = channel;
-    if (lastMessage) return false;
+    if (!lastMessage) return false;
 
     return lastMessage.user !== this._userId;
   }
@@ -121,7 +123,7 @@ class UserChannel {
     this.makeResponse_PushToUserChannelsRes({
       channel,
       resObj: {
-        unreadCount: channel.lastMessage.autoId - lastSeenMessageAutoId,
+        unreadCount: channel.lastMessage?.autoId - lastSeenMessageAutoId,
         lastMessageReadStatus: "DELIVERED",
       },
     });
@@ -130,12 +132,26 @@ class UserChannel {
   async makeResponseForAllMsgsRead(channel) {
     // TODO: not implemented yet
     // get user activity for opponent user as well
-
     // one thing I can do: instead multipe docs created for each channel and user
     // what we can do create just one doc per channel and record all user activities there
+    const opponentUserActivity = channel.opponentUserActivity ?? {};
+    const unreadCount = channel.lastMessage?.autoId - opponentUserActivity.lastSeenMessageAutoId ?? 0;
+
+    this.makeResponse_PushToUserChannelsRes({
+      channel,
+      resObj: {
+        unreadCount,
+        lastMessageReadStatus: opponentUserActivity.lastSeenMessageStatus,
+      },
+    });
   }
 
-  async makeDefaultResponse(channel) {}
+  async makeDefaultResponse(channel) {
+    this.makeResponse_PushToUserChannelsRes({
+      channel,
+      resObj: {},
+    });
+  }
 
   /**
    * @param {{
@@ -155,8 +171,8 @@ class UserChannel {
       channelName: channel.name,
       channelImage: channel.profilePicURL,
       lastMessage: resObj.lastMessage ?? channel.lastMessage,
-      unreadCount: resObj.unreadCount,
-      lastMessageReadStatus: resObj.lastMessageReadStatus,
+      unreadCount: resObj.unreadCount ?? 0,
+      lastMessageReadStatus: resObj.lastMessageReadStatus ?? "READ",
     });
   }
 }
