@@ -15,6 +15,7 @@ const userActivity = new mongoose.Schema({
     ref: "Message",
   },
   lastSeenMessageStatus: String,
+  lastSeenTime: Date,
 });
 
 const UserActivity = mongoose.model("UserActivity", userActivity);

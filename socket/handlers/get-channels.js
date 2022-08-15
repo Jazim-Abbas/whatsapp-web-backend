@@ -26,8 +26,6 @@ class UserChannel {
     this._userChannels = await userService.getUserChannelsWithLastMessage(this._userId);
     await this.convertUserChannelsToMap_AddOpponentUser_AndUserActivity();
 
-    console.log("user-map ----: ", this._userChannelsMap);
-
     this._userChannels.forEach((ch) => {
       if (this.isLastMessageSentByOpponentUser(ch)) {
         return this.makeResponseForMsgUnread(ch);
@@ -93,14 +91,14 @@ class UserChannel {
     const { lastMessage } = channel;
     if (!lastMessage) return false;
 
-    return lastMessage.user !== this._userId;
+    return lastMessage.user.toString() !== this._userId;
   }
 
   isLastMessageSentByLoggedInUser(channel) {
     const { lastMessage } = channel;
     if (!lastMessage) return false;
 
-    return lastMessage.user === this._userId;
+    return lastMessage.user.toString() === this._userId;
   }
 
   async makeResponseForMsgDeletion(channel) {
@@ -135,13 +133,23 @@ class UserChannel {
     // one thing I can do: instead multipe docs created for each channel and user
     // what we can do create just one doc per channel and record all user activities there
     const opponentUserActivity = channel.opponentUserActivity ?? {};
-    const unreadCount = channel.lastMessage?.autoId - opponentUserActivity.lastSeenMessageAutoId ?? 0;
+    const opponentUserUnreadCount = channel.lastMessage?.autoId - opponentUserActivity.lastSeenMessageAutoId ?? 0;
+    let messageStatus = "NOT_DELIVERED";
+
+    if (opponentUserUnreadCount > 0 && channel.lastSeen) {
+      const isUserActiveAfterLastMsg = new Date(channel.lastMessage.timestamp).getTime() < new Date(channel.lastSeen).getTime();
+      messageStatus = isUserActiveAfterLastMsg ? "DELIVERED" : "NOT_DELIVERED";
+    }
+
+    if (opponentUserUnreadCount === 0 && channel.lastMessage && channel.lastSeen) {
+      messageStatus = "READ";
+    }
 
     this.makeResponse_PushToUserChannelsRes({
       channel,
       resObj: {
-        unreadCount,
-        lastMessageReadStatus: opponentUserActivity.lastSeenMessageStatus,
+        unreadCount: 0,
+        lastMessageReadStatus: messageStatus,
       },
     });
   }
